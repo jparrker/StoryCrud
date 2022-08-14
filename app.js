@@ -6,7 +6,10 @@ const exphbs = require('express-handlebars')
 const path = require('path')
 const passport = require('passport')
 const session = require('express-session')
+const MongoStore = require('connect-mongo')
 
+
+// load config 
 dotenv.config({path: "./config/config.env"})
 
 // Passport config
@@ -15,6 +18,10 @@ require('./config/passport')(passport)
 
 const app = express()
 connectDB()
+
+//body parser
+app.use(express.urlencoded({extended: false}))
+app.use(express.json())
 
 
 
@@ -35,6 +42,9 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   // cookie: {secure: true}
+  store: MongoStore.create({
+    mongoUrl: process.env.MONGO_URI
+  })
 }))
 
 
@@ -49,7 +59,7 @@ app.use(express.static(path.join(__dirname, "public")))
 // Routes
 app.use('/', require('./routes/index'))
 app.use('/auth', require('./routes/auth'))
-
+app.use('/stories', require('./routes/stories'))
 
 
 
